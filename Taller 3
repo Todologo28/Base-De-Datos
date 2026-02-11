@@ -603,3 +603,84 @@ SET character_set_client = @saved_cs_client;
 /*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
 -- Dump completed on 2026-02-05 20:53:20
+
+
+--Diagrama De Entidad Relación
+
+erDiagram
+
+    USUARIOS {
+        INT id_usuario PK
+        VARCHAR nombre
+        VARCHAR apellido
+        ENUM estado
+        VARCHAR password_hash
+        VARCHAR cargo
+        DECIMAL salario
+        DATE fecha_ingreso
+    }
+
+    LOGIN {
+        BIGINT id_login PK
+        INT id_usuario FK
+        DATETIME fecha_hora_login
+        ENUM estado_login
+    }
+
+    ACTIVIDADES {
+        INT id_actividad PK
+        DATE fecha_actividad
+        VARCHAR tipo_actividad
+        VARCHAR descripcion_actividad
+    }
+
+    FIDELIZACION_PARTICIPACION {
+        BIGINT id_participacion PK
+        INT id_usuario FK
+        INT id_actividad FK
+        INT puntos_otorgados
+    }
+
+    PERFILES {
+        INT id_perfil PK
+        VARCHAR nombre_perfil
+        VARCHAR descripcion_perfil
+        DATE fecha_vigencia_perfil
+        INT encargado_perfil_id FK
+    }
+
+    USUARIO_PERFIL {
+        INT id_usuario PK, FK
+        INT id_perfil PK, FK
+        DATE fecha_inicio PK
+        DATE fecha_fin
+        BOOLEAN activo
+    }
+
+    %% Relaciones (cardinalidad)
+    USUARIOS ||--o{ LOGIN : "tiene"
+    USUARIOS ||--o{ FIDELIZACION_PARTICIPACION : "participa"
+    ACTIVIDADES ||--o{ FIDELIZACION_PARTICIPACION : "recibe"
+
+    USUARIOS ||--o{ USUARIO_PERFIL : "asignaciones"
+    PERFILES ||--o{ USUARIO_PERFIL : "se_asigna"
+
+    %% Encargado del perfil (opcional)
+    USUARIOS ||--o{ PERFILES : "encargado_de"
+
+
+
+
+-- Dificultades encontradas
+Durante el desarrollo del proyecto se presentaron desafíos principalmente en el diseño y uso de vistas,
+ya que fue necesario integrar información de múltiples tablas mediante JOIN y funciones de agregación 
+sin generar duplicidad de datos ni resultados inconsistentes. Uno de los principales retos fue el manejo 
+de valores nulos en usuarios sin participación o sin registros de login, lo cual se solucionó mediante el
+uso de funciones como IFNULL() y LEFT JOIN para garantizar reportes completos. Además, se requirió calcular 
+métricas temporales y de comportamiento, como el tiempo entre accesos y los días desde el último login, 
+utilizando funciones analíticas como LAG() y TIMESTAMPDIFF(). Como solución, se encapsuló la lógica de negocio
+dentro de las vistas mediante expresiones CASE, subconsultas y funciones de ventana, facilitando la reutilización de consultas
+y mejorando la claridad de los reportes. Como aprendizaje, se comprendió la importancia de un diseño adecuado de vistas para simplificar
+análisis complejos, centralizar reglas de negocio y generar indicadores claros y consistentes para la toma de decisiones.
+
+
