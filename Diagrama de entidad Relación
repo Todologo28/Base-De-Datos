@@ -1,0 +1,60 @@
+erDiagram
+
+    USUARIOS {
+        INT id_usuario PK
+        VARCHAR nombre
+        VARCHAR apellido
+        ENUM estado
+        VARCHAR password_hash
+        VARCHAR cargo
+        DECIMAL salario
+        DATE fecha_ingreso
+    }
+
+    LOGIN {
+        BIGINT id_login PK
+        INT id_usuario FK
+        DATETIME fecha_hora_login
+        ENUM estado_login
+    }
+
+    ACTIVIDADES {
+        INT id_actividad PK
+        DATE fecha_actividad
+        VARCHAR tipo_actividad
+        VARCHAR descripcion_actividad
+    }
+
+    FIDELIZACION_PARTICIPACION {
+        BIGINT id_participacion PK
+        INT id_usuario FK
+        INT id_actividad FK
+        INT puntos_otorgados
+    }
+
+    PERFILES {
+        INT id_perfil PK
+        VARCHAR nombre_perfil
+        VARCHAR descripcion_perfil
+        DATE fecha_vigencia_perfil
+        INT encargado_perfil_id FK
+    }
+
+    USUARIO_PERFIL {
+        INT id_usuario PK, FK
+        INT id_perfil PK, FK
+        DATE fecha_inicio PK
+        DATE fecha_fin
+        BOOLEAN activo
+    }
+
+    %% Relaciones (cardinalidad)
+    USUARIOS ||--o{ LOGIN : "tiene"
+    USUARIOS ||--o{ FIDELIZACION_PARTICIPACION : "participa"
+    ACTIVIDADES ||--o{ FIDELIZACION_PARTICIPACION : "recibe"
+
+    USUARIOS ||--o{ USUARIO_PERFIL : "asignaciones"
+    PERFILES ||--o{ USUARIO_PERFIL : "se_asigna"
+
+    %% Encargado del perfil (opcional)
+    USUARIOS ||--o{ PERFILES : "encargado_de"
