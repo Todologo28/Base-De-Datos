@@ -1,5 +1,4 @@
- 
---
+
 -- Host: localhost    Database: xyz_db
 -- ------------------------------------------------------
 -- Server version	12.1.2-MariaDB
